@@ -1,0 +1,156 @@
+// 局部變量會將全局擠掉 最後一次出現的全局變量會把前面的全局變量擠掉
+//
+// $color : red;
+// $color : pink;
+// $width: 0;
+// $content: "我是sass";
+// $tr: 5px 10px;
+// $bl: 7px 15px;
+// div {
+//     $color: blue !global;
+//     color: $color;
+//     // padding: $tr $bl;
+//     border: 1px solid orange;
+//     padding: join($tr, $bl);
+// }
+
+// h1:after {
+//     content: $content;
+//     color: $color;
+// }
+//sass中嵌套規則的使用
+//父選擇器符號&
+//屬性嵌套
+//樣式類的繼承@extend
+
+//嵌套過於深層不太好  適可而止
+$list-group-bg: #fff;
+$list-group-border: #ddd;
+$list-group-border-radius: 10px;
+$len:4;
+$content-width: 50px;
+// $border-bottom-left-radius:20px;
+
+//混入指令和繼承指令不同在於 ： 混入指令不會將樣式編譯到css中 而繼承會被編譯到css中
+//混入指令有作用域 必須將混入指令放在對應的上方才能被調用到
+// @mixin radius($radius) {
+//     border-bottom-left-radius: $radius;
+//     border-bottom-right-radius: $radius;
+// }
+@mixin radius($direction, $radius:4px) {
+    @if $direction==top {
+        border-top-left-radius: $radius;
+        border-top-right-radius: $radius;
+    }
+
+    @else if $direction==botto {
+        border-bottom-left-radius: $radius;
+        border-bottom-right-radius: $radius;
+    }
+}
+
+
+// .bottom-border-radius{
+//     border-bottom-left-radius:$border-bottom-left-radius;
+//     border-bottom-right-radius:$border-bottom-left-radius;
+// }
+
+
+.content {
+    padding: 20px;
+    width: 500px;
+
+    font: {
+        size: 16px;
+        font-family: fantasy;
+        weight: 200;
+    }
+
+    .list-group {
+        padding-left: 0;
+
+        .list-group-item {
+            display: block;
+            position: relative;
+            padding: 10px 15px;
+            background-color: $list-group-bg;
+            border: 1px solid $list-group-border;
+            margin-bottom: -1px;
+
+            //父選擇器
+            &:first-child {
+                // @extend .top-border-radius;
+                @include radius(top);
+            }
+
+            &:last-child {
+                // @extend .bottom-border-radius;
+                // @include radius(7px);
+                @include radius(bottom);
+            }
+        }
+    }
+}
+
+//不知有多少種屬性 就在參數后添加...
+@mixin box-shaow($shaows...) {
+    -moz-box-shaow: $shaows;
+    -webkit-box-shaow: $shaows;
+    box-shaow: $shaows;
+}
+
+// @mixin common-link{
+//     a{
+//         color: pink;
+//         background-color: blue;
+//     }
+// }
+// @include common-link;
+// .top-border-radius {
+//     border-top-left-radius: $list-group-border-radius;
+//     border-top-right-radius: $list-group-border-radius;
+// }
+
+//混入 在一個class中引入另一個已經定義的class
+//定義混入指令@mixin 在此指令后添加名稱與樣式
+//引入混入樣式@include  在此指令后添加混合名稱
+//參數（Arguments） 參數用於給混入指令中的樣式設定變量，并且賦值使用。在定義混入指令的時候，按照變量的格式，通過逗號分隔，將參數寫進圓括號裏。
+
+// $width : 4px;
+
+
+//sass 提供了可用的内置函數，也允許自定義函數
+
+//自定義函數 @function name()可傳參或不傳參 傳參個性化 要的就是個性化
+//基礎運算
+@function content-width($n){
+    @return $content-width * $n;
+}
+
+.content-center {
+    @for $i from 1 through 4 {
+        .content-#{$i} {
+            // width: 50px * $i;
+            width: content-width(4);
+            height: 100px;
+            background-color: orange;
+        }
+    }
+    //while
+    @while $len > 0 {
+        .content-#{$len}{
+            background-color: green;
+        }
+        $len: $len - 2;
+    }
+}
+
+//each
+@each $dir in left,
+right,
+center,
+bottom {
+    .content-#{$dir} {
+        background-image: url('img/#{$dir}.png');
+    }
+}
